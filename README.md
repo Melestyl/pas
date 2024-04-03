@@ -4,3 +4,6 @@ Project created during "Programmation Système" subject in school, using shared 
 # Authors
 DELANOY Anael
 TELLIER--CALOONE Tom
+
+# Version
+0.0.1
