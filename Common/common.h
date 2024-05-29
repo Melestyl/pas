@@ -10,6 +10,12 @@
 #include "protocol.h"
 
 /**
+ * @def DEBUG
+ * @brief Debug macro (useful...)
+ */
+#define DEBUG(...) printf(__VA_ARGS__); getchar();
+
+/**
  * @brief Read a config file and return the value of a key
  * @param path_name: path to the config file
  * @param searched_key: key to search
