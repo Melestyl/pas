@@ -7,6 +7,8 @@
 #include <sys/shm.h>
 #include <errno.h>
 
+#include "protocol.h"
+
 /**
  * @brief Read a config file and return the value of a key
  * @param path_name: path to the config file
