@@ -8,5 +8,5 @@
 
 struct area {
     pthread_mutex_t mutex;
-    int shared_memory;    
+    int shared_memory; // user pid or null
 };
