@@ -4,42 +4,6 @@
 #include <unistd.h>
 
 /**
- * @def OK
- * @brief OK code
- */
-#define OK 1
-
-/**
- * @def NOK
- * @brief NOK code
- */
-#define NOK 2
-
-/**
- * @def ASK_AREA
- * @brief Ask the list of areas 
- */
-#define ASK_AREA 3
-
-/**
- * @def LIST_AREA
- * @brief Return the list of areas 
- */
-#define LIST_AREA 4
-
-/**
- * @def CREATE_AREA
- * @brief Create an area with a name and a type
- */
-#define CREATE_AREA 5
-
-/**
- * @def DEL_AREA
- * @brief Delete an area with a name
- */
-#define DEL_AREA 6
-
-/**
  * @def MAX_LENGTH_DATA
  * @brief Maximum length of data in a message
  */
@@ -59,5 +23,41 @@ struct message{
     char code;
     char data[MAX_LENGTH_DATA];
 };
+
+/**
+ * @def OK
+ * @brief OK code
+ */
+#define OK 1
+
+/**
+ * @def NOK
+ * @brief NOK code
+ */
+#define NOK 2
+
+/**
+ * @def ASK_AREAS
+ * @brief Ask the list of areas 
+ */
+#define ASK_AREAS 3
+
+/**
+ * @def LIST_AREAS
+ * @brief Return the list of areas 
+ */
+#define LIST_AREAS 4
+
+/**
+ * @def CREATE_AREA
+ * @brief Create an area with a name and a type
+ */
+#define CREATE_AREA 5
+
+/**
+ * @def DEL_AREA
+ * @brief Delete an area with its name
+ */
+#define DEL_AREA 6
 
 #endif
