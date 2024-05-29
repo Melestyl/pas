@@ -78,3 +78,13 @@ int main(int argc, char* argv[]) {
 	}
 
 }
+
+void send_nok() {
+	// TODO
+}
+void ask_areas() {
+// TODO
+}
+void del_area() {
+// TODO
+}
