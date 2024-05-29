@@ -34,7 +34,7 @@ struct area {
 	enum type type; // desk or meeting room
 	pthread_mutex_t mutex; // to prevent any conflicts
 	int shared_memory; // user pid or null
-	char path[120]; // path to shared memory (name of the area)
+	char path[120]; // path to shared memory (unique name of the shared_memory)
 };
 
 /**
