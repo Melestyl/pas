@@ -1,7 +1,7 @@
 CC?=gcc
 RM?=rm -f
 
-FILE_NAME=Server
+FILE_NAME=server
 
 COMMON=../Common/common.o
 
