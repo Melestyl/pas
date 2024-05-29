@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include <sys/shm.h>
-#include <pthread.h>
 #include <errno.h>
 
 /**
@@ -42,4 +41,3 @@ struct area {
  * @brief Typedef for area structure
  */
 typedef struct area area_t;
-
