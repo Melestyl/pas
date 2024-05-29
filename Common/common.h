@@ -1,4 +1,7 @@
-#include <unistd.h> 
+#ifndef COMMON_H
+#define COMMON_H
+
+#include <unistd.h>
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <string.h>
@@ -8,6 +11,12 @@
 #include <errno.h>
 
 #include "protocol.h"
+
+/**
+ * @def DEBUG
+ * @brief Debug macro (useful...)
+ */
+#define DEBUG(...) printf(__VA_ARGS__); getchar();
 
 /**
  * @brief Read a config file and return the value of a key
@@ -44,3 +53,5 @@ struct area {
  * @brief Typedef for area structure
  */
 typedef struct area area_t;
+
+#endif //COMMON_H
