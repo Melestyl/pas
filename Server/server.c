@@ -1,8 +1,11 @@
 #include "server.h"
+#include "areas.h"
 
 #define STR_LARGE 100
 #define STR_SMALL 50
 
+// Global areas list
+node_t *areas_list = NULL;
 
 int main(int argc, char* argv[]) {
 	int num;
@@ -74,49 +77,4 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-}
-
-
-area_t* create_area(enum type type, char* name) {
-	static unsigned shared_memory_id = 0;
-	char shared_memory_prefix[STR_SMALL], project_id_str[STR_SMALL], shared_memory_path[STR_LARGE];
-	int project_id;
-	key_t token;
-
-	// Allocating memory for area
-	area_t* area = (area_t*) malloc(sizeof(area_t));
-	if (area == NULL) {
-		perror("malloc");
-		exit(1);
-	}
-
-	// Setting type
-	area->type = type;
-
-	// Setting name
-	strcpy(area->name, name);
-
-	// Retrieving shared memory path and project id
-	read_config("../Common/config.txt", "SHARED_MEMORY_PREFIX", shared_memory_prefix);
-	project_id = atoi(read_config("../Common/config.txt", "PROJECT_ID", project_id_str));
-
-	// Initializing shared memory
-	sprintf(shared_memory_path, "%s%d", shared_memory_prefix, shared_memory_id++);
-	token = ftok(shared_memory_path, project_id);
-	area->shared_memory = shmget(token, sizeof(int), IPC_CREAT | 0666);
-	if (area->shared_memory == -1) {
-		perror("shmget");
-		exit(1);
-	}
-	strcpy(area->path, shared_memory_path);
-
-	// Initializing mutex
-	pthread_mutex_init(&area->mutex, NULL);
-
-	// Returning area's pointer
-	return area;
-}
-
-int main() {
-	return 0;
 }

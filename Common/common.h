@@ -1,4 +1,7 @@
-#include <unistd.h> 
+#ifndef COMMON_H
+#define COMMON_H
+
+#include <unistd.h>
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <string.h>
@@ -12,6 +15,12 @@
 #define MESSAGE_KEY 69 //FIXME: config.txt
 
 #define LENGTH_NAME_AREA 16
+
+/**
+ * @def DEBUG
+ * @brief Debug macro (useful...)
+ */
+#define DEBUG(...) printf(__VA_ARGS__); getchar();
 
 /**
  * @brief Read a config file and return the value of a key
@@ -48,3 +57,5 @@ struct area {
  * @brief Typedef for area structure
  */
 typedef struct area area_t;
+
+#endif //COMMON_H
