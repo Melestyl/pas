@@ -1,8 +1,11 @@
 #include "server.h"
 
+#define STR_LARGE 100
+#define STR_SMALL 50
+
 area_t* create_area(enum type type, char* name) {
 	static unsigned shared_memory_id = 0;
-	char shared_memory_prefix[100], project_id_str[100], shared_memory_path[120];
+	char shared_memory_prefix[STR_SMALL], project_id_str[STR_SMALL], shared_memory_path[STR_LARGE];
 	int project_id;
 	key_t token;
 

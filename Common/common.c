@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#define STR_LARGE_LINE 100
+#define MAX_CONFIG_LINE 200
+
 char* read_config(char* path_name, char* searched_key, char* found_value) {
-	char key[100], value[100], line[200];
+	char key[STR_LARGE_LINE], value[STR_LARGE_LINE], line[MAX_CONFIG_LINE];
 	FILE* file = fopen(path_name, "r");
 
 	// Reading config file
@@ -12,7 +15,7 @@ char* read_config(char* path_name, char* searched_key, char* found_value) {
 	}
 
 	// Reading line by line
-	while (fgets(line, 200, file) != NULL) {
+	while (fgets(line, MAX_CONFIG_LINE, file) != NULL) {
 		// Reading key and value
 		sscanf(line, "%s %s", key, value);
 
