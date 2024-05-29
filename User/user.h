@@ -1,5 +1,6 @@
 #include "../Common/common.h"
 
+// admin password to access the admin menu
 #define ADMIN_PASSWORD "1234"
 
 /**
