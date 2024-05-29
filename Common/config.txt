@@ -1,3 +1,2 @@
-PROJECT_ID 69
-MAILBOX_PATH mailbox
-SHARED_MEMORY_PREFIX shm_
+MAILBOX_PATH ../Common/mailbox
+SHARED_MEMORY_PATH ../Common/shared_memory
