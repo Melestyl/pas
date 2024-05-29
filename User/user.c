@@ -27,7 +27,7 @@ void menu(char is_admin) {
                 "\t6. Supprimer un espace\n");
     }
 
-    printf("\nVotre choix : \n");
+    printf("\nVotre choix : ");
     scanf("%d", &choice);
     switch (choice) {
         case 0:
@@ -61,4 +61,32 @@ void menu(char is_admin) {
             printf("Commande inconnue\n");
             break;
     }
+}
+
+void show_spaces() {
+    printf("Liste des espaces :\n");
+}
+
+void book_space() {
+    printf("Réserver un espace\n");
+}
+
+void return_space() {
+    printf("Rendre un espace\n");
+}
+
+void show_my_bookings() {
+    printf("Voir mes réservations\n");
+}
+
+void add_space() {
+    printf("Ajouter un espace\n");
+}
+
+void delete_space() {
+    printf("Supprimer un espace\n");
+}
+
+void end() {
+    exit(0);
 }
