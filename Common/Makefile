@@ -1,15 +1,16 @@
 CC?=gcc
 RM?=rm -f
 
-all: common.o shared_memory mailbox
+COMMUNICATION=shared_memory mailbox
+
+all: common.o communication
 
 common.o: common.c common.h
 	$(CC) -c common.c
 
-shared_memory:
-	touch shared_memory
-mailbox:
-	touch mailbox
+communication:
+	touch $(COMMUNICATION)
 
 clean:
 	$(RM) *.o
+	$(RM) $(COMMUNICATION)
