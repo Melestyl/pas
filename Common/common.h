@@ -12,6 +12,10 @@
 
 #include "protocol.h"
 
+#define MESSAGE_KEY 69 //FIXME: config.txt
+
+#define LENGTH_NAME_AREA 16
+
 /**
  * @def DEBUG
  * @brief Debug macro (useful...)
@@ -41,7 +45,7 @@ enum type {
  * @brief Area structure
  */
 struct area {
-	char name[16]; // name of the area
+	char name[LENGTH_NAME_AREA]; // name of the area
 	enum type type; // desk or meeting room
 	pthread_mutex_t mutex; // to prevent any conflicts
 	int shared_memory; // user pid or null
