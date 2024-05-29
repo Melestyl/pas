@@ -10,19 +10,19 @@
 void menu(char is_admin);
 
 /**
- * @brief Show the list of spaces
+ * @brief Show the list of areas
  */
-void show_spaces();
+void show_areas();
 
 /**
- * @brief Book a space
+ * @brief Book a area
  */
-void book_space();
+void book_area();
 
 /**
- * @brief Return a space
+ * @brief Return a area
  */
-void return_space();
+void return_area();
 
 /**
  * @brief Show the user's bookings
@@ -30,14 +30,14 @@ void return_space();
 void show_my_bookings();
 
 /**
- * @brief Add a space
+ * @brief Add a area
  */
-void add_space();
+void add_area();
 
 /**
- * @brief Delete a space
+ * @brief Delete a area
  */
-void delete_space();
+void delete_area();
 
 /**
  * @brief End the program
