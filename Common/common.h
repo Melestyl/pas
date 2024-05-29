@@ -1,4 +1,7 @@
-#include <unistd.h> 
+#ifndef COMMON_H
+#define COMMON_H
+
+#include <unistd.h>
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <string.h>
@@ -50,3 +53,5 @@ struct area {
  * @brief Typedef for area structure
  */
 typedef struct area area_t;
+
+#endif //COMMON_H
