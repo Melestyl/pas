@@ -7,7 +7,14 @@
 
 #include "../Common/common.h"
 
-void send_nok();
+/**
+ * @fn void send_nok(pid_t sender, int num)
+ * @brief Send a NOK message to the sender
+ * @param sender: pid of the sender
+ * @param num: id of the message queue
+ */
+void send_nok(pid_t sender, int num);
+
 void ask_areas();
 void del_area();
 

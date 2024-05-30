@@ -38,11 +38,11 @@ int main(int argc, char* argv[]) {
 		switch (msg.code) {
 			case OK:
 				printf("\"OK\" the server does not receive this code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, num);
 				break;
 			case NOK:
 				printf("\"NOK\" the server does not receive this code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, num);
 				break;
 			case ASK_AREAS:
 				printf("Message code ASK_AREAS\n");
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 				break;
 			case LIST_AREAS:
 				printf("\"LIST_AREAS\" the server does not receive this code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, num);
 				break;
 			case CREATE_AREA:
 				printf("Message code CREATE_AREA\n");
@@ -72,16 +72,29 @@ int main(int argc, char* argv[]) {
 				break;
 			default:
 				printf("Unknown message code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, num);
 				break;
 		}
 	}
 
 }
 
-void send_nok() {
-	// TODO
+void send_nok(pid_t sender, int num) {
+	struct message msg_send;
+
+	//init message
+	msg_send.mtype = sender;
+	msg_send.sender = getpid();
+	msg_send.code = NOK;
+
+	//send message
+	if (msgsnd(num, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+		perror("msgsnd");
+		exit(1);
+	}
+	printf("NOK message envoyé à %d\n", sender);
 }
+
 void ask_areas() {
 // TODO
 }
