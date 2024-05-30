@@ -157,7 +157,10 @@ int create_area(enum type type, char* name) {
  * @param shared_memory: shared memory segment of the area to add
  */
 node_t * add_area_to_list(node_t * head, int shared_memory) {
-	return add_node(head, shared_memory);
+	if (head == NULL)
+		return create_node(shared_memory);
+	else
+		return add_node(head, shared_memory);
 }
 
 /**
