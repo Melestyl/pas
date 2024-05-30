@@ -8,7 +8,7 @@
 node_t *areas_list = NULL;
 
 int main(int argc, char* argv[]) {
-	int num, segm_id;
+	int num, area_segm_id;
     key_t msg_key = MESSAGE_KEY; // key of the message queue
     int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
@@ -66,19 +66,25 @@ int main(int argc, char* argv[]) {
 				else
 					enum_type = MEETING_ROOM;
 				
-				segm_id = create_area(enum_type, name);
+				area_segm_id = create_area(enum_type, name);
 
 				//add the area to the list
-				areas_list=(areas_list,segm_id);
+				areas_list=(areas_list,area_segm_id);
 				
 				break;
 			case DEL_AREA:
 				printf("Message code DEL_AREA\n");
 
-				// Reading 
-				sscanf(msg.data, "%c:%s", &type, name);
+				// Reading segm id received
+				sscanf(msg.data,"%s", area_segm_id);
 
-				delete_area();
+				//delete area
+				del_area(area_segm_id); //TODO: anticipate the case of a deletion error
+				
+				//send ok
+				send_ok(msg.sender, num);
+
+
 				break;
 			default:
 				printf("Unknown message code : send NOK\n");
@@ -92,10 +98,27 @@ int main(int argc, char* argv[]) {
 void send_nok() {
 	// TODO
 }
+
+void send_ok(pid_t sender, int num) {
+
+	struct message msg_send;
+
+	//init message
+	msg_send.mtype = sender;
+	msg_send.sender = getpid();
+	msg_send.code = OK;
+
+	//send message
+	if (msgsnd(num, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+		perror("msgsnd");
+		exit(1);
+	}
+	printf("OK message envoyé à %d\n", sender);
+}
+
 void ask_areas() {
 // TODO
 }
-void del_area() {
-
-// TODO
+void del_area(int area_segm_id) {
+	areas_list=(areas_list,area_segm_id);
 }
