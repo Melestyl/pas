@@ -72,6 +72,11 @@ node_t *remove_node(node_t * head, int data) {
 				free(temp);
 				return head;
 			}
+			else if(prev == NULL && temp->next == NULL){
+				delete_area(temp->data);
+				free(temp);
+				return NULL;
+			}
 			else {
 				prev->next = temp->next;
 				delete_area(temp->data);
