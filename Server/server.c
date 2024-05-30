@@ -8,7 +8,7 @@
 node_t *areas_list = NULL;
 
 int main(int argc, char* argv[]) {
-	int num;
+	int num, segm_id;
     key_t msg_key = MESSAGE_KEY; // key of the message queue
     int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
@@ -57,6 +57,7 @@ int main(int argc, char* argv[]) {
 				
 				// Reading type and name of the message
 				sscanf(msg.data, "%c:%s", &type, name);
+
 				//TODO: chexk if the name is not already used
 
 				//convert char type to enum type
@@ -65,13 +66,18 @@ int main(int argc, char* argv[]) {
 				else
 					enum_type = MEETING_ROOM;
 				
-				create_area(enum_type, name); //TODO: recover the shared memory segment
-				//TODO: add the area to the list
+				segm_id = (enum_type, name); //TODO: recover the shared memory segment
+				//add the area to the list
+				areas_list=(areas_list,segm_id);
+				
 				break;
 			case DEL_AREA:
 				printf("Message code DEL_AREA\n");
+
 				// Reading 
-				del_area();
+				sscanf(msg.data, "%c:%s", &type, name);
+
+				delete_area();
 				break;
 			default:
 				printf("Unknown message code : send NOK\n");
