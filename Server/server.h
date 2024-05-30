@@ -16,7 +16,14 @@ void send_nok();
  * @param num: id of the message queue
  */
 void send_ok(pid_t sender, int num);
-void ask_areas();
+
+/**
+ * @fn void ask_areas(pid_t sender, int num)
+ * @brief Send the list of areas to the sender
+ * @param sender: pid of the sender
+ * @param num: id of the message queue
+ */
+void ask_areas(pid_t sender, int num);
 
 /**
  * @fn void del_area(int area_segm_id)

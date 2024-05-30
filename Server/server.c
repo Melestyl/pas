@@ -8,6 +8,7 @@
 node_t *areas_list = NULL;
 
 int main(int argc, char* argv[]) {
+	int nb_areas = 0;
 	int num, area_segm_id;
     key_t msg_key = MESSAGE_KEY; // key of the message queue
     int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
@@ -46,7 +47,7 @@ int main(int argc, char* argv[]) {
 				break;
 			case ASK_AREAS:
 				printf("Message code ASK_AREAS\n");
-				ask_areas();
+				ask_areas(msg.sender, num);
 				break;
 			case LIST_AREAS:
 				printf("\"LIST_AREAS\" the server does not receive this code : send NOK\n");
@@ -54,11 +55,16 @@ int main(int argc, char* argv[]) {
 				break;
 			case CREATE_AREA:
 				printf("Message code CREATE_AREA\n");
-				
+
+				if (nb_areas > MAX_AREA) {
+					printf("Too many areas\n");
+					send_nok();
+					break;
+				}
 				// Reading type and name of the message
 				sscanf(msg.data, "%c:%s", &type, name);
 
-				//TODO: chexk if the name is not already used
+				//TODO: check if the name is not already used
 
 				//convert char type to enum type
 				if (type == 0)
@@ -67,6 +73,7 @@ int main(int argc, char* argv[]) {
 					enum_type = MEETING_ROOM;
 				
 				area_segm_id = create_area(enum_type, name);
+				nb_areas++;
 
 				//add the area to the list
 				areas_list=(areas_list,area_segm_id);
@@ -100,7 +107,6 @@ void send_nok() {
 }
 
 void send_ok(pid_t sender, int num) {
-
 	struct message msg_send;
 
 	//init message
@@ -116,9 +122,31 @@ void send_ok(pid_t sender, int num) {
 	printf("OK message envoyé à %d\n", sender);
 }
 
-void ask_areas() {
-// TODO
+void ask_areas(pid_t sender, int num) {
+	char data[MAX_LENGTH_DATA];
+	node_t * temp = areas_list;
+	struct message msg_send;
+
+	//read the list of areas and put it in data
+	while(temp != NULL) {
+		sprintf(data, "%d:", temp->data);
+		temp = temp->next;
+	}
+	data[strlen(data)-1] = '\0'; //removing the last ':' and replacing it by '\0'
+
+	//init message
+	msg_send.mtype = sender;
+	msg_send.sender = getpid();
+	msg_send.code = LIST_AREAS;
+	strcpy(msg_send.data, data);
+
+	//send message
+	if (msgsnd(num, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+		perror("msgsnd");
+		exit(1);
+	}
 }
+
 void del_area(int area_segm_id) {
 	areas_list=(areas_list,area_segm_id);
 }
