@@ -157,6 +157,42 @@ int create_area(enum type type, char* name) {
 }
 
 /**
+ * @brief Verify if an area exists in the list
+ * @param name: name of the area to search
+ * @param head: head of the list
+ * @return int: 1 if the area exists, 0 otherwise
+ */
+int area_exists(char name[LENGTH_NAME_AREA], node_t * head) {
+	node_t * temp = head;
+	area_t * area;
+
+	while(temp != NULL) {
+		// Attaching shared memory
+		if( area = (area_t *) shmat(temp->data, NULL, 0) == -1) {
+			perror("shmat");
+			exit(1);
+		}
+
+		// Comparing names of areas and if found, detaching shared memory and returning 1
+		if(strcmp(area->name, name) == 0) {
+			if(shmdt(area) == -1) {
+				perror("shmdt");
+				exit(1);
+			}
+			return 1;
+		}
+
+		// Detaching shared memory and moving to the next node
+		if(shmdt(area) == -1) {
+			perror("shmdt");
+			exit(1);
+		}
+		temp = temp->next;
+	}
+	return 0;
+}
+
+/**
  * @brief Add an area to the list of known areas
  * @param head: head of the list
  * @param shared_memory: shared memory segment of the area to add

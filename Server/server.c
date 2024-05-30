@@ -56,15 +56,23 @@ int main(int argc, char* argv[]) {
 			case CREATE_AREA:
 				printf("Message code CREATE_AREA\n");
 
+				// Check if the maximum number of areas is not reached
 				if (nb_areas > MAX_AREA) {
 					printf("Too many areas\n");
 					send_nok();
 					break;
 				}
+
 				// Reading type and name of the message
 				sscanf(msg.data, "%c:%s", &type, name);
 
-				//TODO: check if the name is not already used
+				//check if the name is not already used
+				if (area_exists(name, areas_list)) {
+					printf("The name of the area already exists\n");
+					send_nok();
+					break;
+				}
+
 
 				//convert char type to enum type
 				if (type == 0)
