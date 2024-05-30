@@ -66,7 +66,8 @@ int main(int argc, char* argv[]) {
 				else
 					enum_type = MEETING_ROOM;
 				
-				segm_id = (enum_type, name); //TODO: recover the shared memory segment
+				segm_id = create_area(enum_type, name);
+
 				//add the area to the list
 				areas_list=(areas_list,segm_id);
 				
