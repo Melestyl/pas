@@ -56,7 +56,8 @@ int main(int argc, char* argv[]) {
 				printf("Message code CREATE_AREA\n");
 				
 				// Reading type and name of the message
-				scanf("%c:%s", &type, name);
+				sscanf(msg.data, "%c:%s", &type, name);
+				//TODO: chexk if the name is not already used
 
 				//convert char type to enum type
 				if (type == 0)
@@ -64,10 +65,12 @@ int main(int argc, char* argv[]) {
 				else
 					enum_type = MEETING_ROOM;
 				
-				create_area(enum_type, name);
+				create_area(enum_type, name); //TODO: recover the shared memory segment
+				//TODO: add the area to the list
 				break;
 			case DEL_AREA:
 				printf("Message code DEL_AREA\n");
+				// Reading 
 				del_area();
 				break;
 			default:
@@ -86,5 +89,6 @@ void ask_areas() {
 // TODO
 }
 void del_area() {
+
 // TODO
 }
