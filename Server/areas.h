@@ -6,15 +6,6 @@
 #include "../Common/common.h"
 
 /**
- * @struct node
- * @brief Node structure to create a linked list
- */
-typedef struct node {
-	int data;
-	struct node* next;
-} node_t;
-
-/**
  * @brief Create a new area
  * @param type: type of the area
  * @param name: name of the area
@@ -55,17 +46,5 @@ node_t * add_area_to_list(node_t * head, int shared_memory, bool* success);
  * @return new head of the list
  */
 node_t *remove_area_from_list(node_t * head, char* name, bool* success);
-
-/**
- * @brief Print the list
- * @param head: head of the list
- */
-void print_list(node_t * head);
-
-/**
- * @brief Free the list
- * @param head: head of the list
- */
-void free_list(node_t * head);
 
 #endif //PAS_AREAS_H
