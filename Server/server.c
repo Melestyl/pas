@@ -11,8 +11,8 @@ int main(int argc, char* argv[]) {
 	int nb_areas = 0;
 	int mailbox, area_segm_id;
 	bool success;
-    key_t msg_key = MESSAGE_KEY; // key of the message queue
-    int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
+  key_t msg_key = MESSAGE_KEY; // key of the message queue
+  int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
 	char type; // equivalent of enum type in char
 	char name[LENGTH_NAME_AREA]; // name of the area
@@ -40,11 +40,11 @@ int main(int argc, char* argv[]) {
 		switch (msg.code) {
 			case OK:
 				printf("\"OK\" the server does not receive this code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, mailbox);
 				break;
 			case NOK:
 				printf("\"NOK\" the server does not receive this code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, mailbox);
 				break;
 			case ASK_AREAS:
 				printf("Message code ASK_AREAS\n");
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 				break;
 			case LIST_AREAS:
 				printf("\"LIST_AREAS\" the server does not receive this code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, mailbox);
 				break;
 			case CREATE_AREA:
 				printf("Message code CREATE_AREA\n");
@@ -125,15 +125,27 @@ int main(int argc, char* argv[]) {
 				break;
 			default:
 				printf("Unknown message code : send NOK\n");
-				send_nok();
+				send_nok(msg.sender, mailbox);
 				break;
 		}
 	}
 
 }
 
-void send_nok() {
-	// TODO
+void send_nok(pid_t sender, int mailbox) {
+	struct message msg_send;
+
+	//init message
+	msg_send.mtype = sender;
+	msg_send.sender = getpid();
+	msg_send.code = NOK;
+
+	//send message
+	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+		perror("msgsnd");
+		exit(1);
+	}
+	printf("NOK message envoyé à %d\n", sender);
 }
 
 void send_ok(pid_t sender, int mailbox) {
