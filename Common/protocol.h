@@ -7,14 +7,16 @@
  * @def MAX_LENGTH_DATA
  * @brief Maximum length of data in a message
  */
-#define MAX_LENGTH_DATA 200
+#define MAX_AREA 50
+#define LENGTH_ID_SEGM (5+1) // +1 : ':'
+#define MAX_LENGTH_DATA (MAX_AREA*LENGTH_ID_SEGM+1-1) //+1 : '\0'; -1 : last ':'
 
 /**
  * @def message
  * @param mtype: type of the message
  * @param sender: pid sender
  * @param code: request code
- * @param data: request data
+ * @param data: request data MAX_LENGTH_DATA characters
  * @brief Structure of a message used in a mailbox
  */
 struct message{

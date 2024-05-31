@@ -16,6 +16,10 @@
 
 #define LENGTH_NAME_AREA 16
 
+#define bool char 
+#define true 1
+#define false 0
+
 /**
  * @def DEBUG
  * @brief Debug macro (useful...)
