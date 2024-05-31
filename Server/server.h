@@ -8,12 +8,12 @@
 #include "../Common/common.h"
 
 /**
- * @fn void send_nok(pid_t sender, int num)
+ * @fn void send_nok(pid_t sender, int mailbox)
  * @brief Send a NOK message to the sender
  * @param sender: pid of the sender
- * @param num: id of the message queue
+ * @param mailbox: mailbox to send the message
  */
-void send_nok(pid_t sender, int num);
+void send_nok(pid_t sender, int mailbox);
 
 void ask_areas();
 void del_area();
