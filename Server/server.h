@@ -28,8 +28,10 @@ void list_areas(pid_t sender, int mailbox);
 /**
  * @fn void del_area(int area_segm_id)
  * @brief Delete an area and remove it from the list
+ * @param name: name of the area to delete
  * @param area_segm_id: id of the shared memory segment
+ * @param success: bool to indicate if the area was deleted
  */
-void del_area(int area_segm_id);
+void del_area(char* name, bool* success);
 
 #endif //PAS_SERVER_H

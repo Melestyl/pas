@@ -10,6 +10,7 @@ node_t *areas_list = NULL;
 int main(int argc, char* argv[]) {
 	int nb_areas = 0;
 	int mailbox, area_segm_id;
+	bool success;
     key_t msg_key = MESSAGE_KEY; // key of the message queue
     int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
@@ -66,7 +67,7 @@ int main(int argc, char* argv[]) {
 				// Reading type and name of the message
 				sscanf(msg.data, "%c:%s", &type, name);
 
-				//check if the name is not already used
+				// Check if the name is not already used
 				if (area_exists(name, areas_list)) {
 					printf("The name of the area already exists\n");
 					send_nok();
@@ -74,32 +75,53 @@ int main(int argc, char* argv[]) {
 				}
 
 
-				//convert char type to enum type
+				// Convert char type to enum type
 				if (type == 0)
 					enum_type = DESK;
-				else
+				else if (type == 1)
 					enum_type = MEETING_ROOM;
+				else {
+					printf("Unknown type\n");
+					send_nok();
+					break;
+				}
 				
+				// Create the area and get the shared memory segment id
 				area_segm_id = create_area(enum_type, name);
+				if(area_segm_id == -1) {
+					printf("Error while creating the area\n");
+					send_nok();
+					break;
+				}
+
 				nb_areas++;
 
 				//add the area to the list
-				areas_list=(areas_list,area_segm_id);
+				areas_list=add_area_to_list(areas_list,area_segm_id,&success);
+				if(!success) {
+					printf("Error while adding the area to the list\n");
+					send_nok();
+					break;
+				}
 				
 				break;
 			case DEL_AREA:
 				printf("Message code DEL_AREA\n");
 
 				// Reading segm id received
-				sscanf(msg.data,"%s", area_segm_id);
+				sscanf(msg.data,"%s", name);
 
 				//delete area
-				del_area(area_segm_id); //TODO: anticipate the case of a deletion error
+				del_area(name, &success);
+				if(!success) {
+					printf("Error while deleting the area\n");
+					send_nok();
+					break;
+				}
 				nb_areas--;
+
 				//send ok
 				send_ok(msg.sender, mailbox);
-
-
 				break;
 			default:
 				printf("Unknown message code : send NOK\n");
@@ -152,10 +174,10 @@ void list_areas(pid_t sender, int mailbox) {
 	//send message
 	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
 		perror("msgsnd");
-		exit(1);
+		send_nok();
 	}
 }
 
-void del_area(int area_segm_id) {
-	areas_list=remove_area_from_list(areas_list,area_segm_id);
+void del_area(char* name,bool* success) {
+	areas_list=remove_area_from_list(areas_list,name, success);
 }
