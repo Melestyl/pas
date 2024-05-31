@@ -11,8 +11,8 @@ int main(int argc, char* argv[]) {
 	int nb_areas = 0;
 	int mailbox, area_segm_id;
 	bool success;
-  key_t msg_key = MESSAGE_KEY; // key of the message queue
-  int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
+	key_t msg_key = MESSAGE_KEY; // key of the message queue
+	int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
 	char type; // equivalent of enum type in char
 	char name[LENGTH_NAME_AREA]; // name of the area
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 				// Check if the maximum number of areas is not reached
 				if (nb_areas > MAX_AREA) {
 					printf("Too many areas\n");
-					send_nok();
+					send_nok(msg.sender, mailbox);
 					break;
 				}
 
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 				// Check if the name is not already used
 				if (area_exists(name, areas_list)) {
 					printf("The name of the area already exists\n");
-					send_nok();
+					send_nok(msg.sender, mailbox);
 					break;
 				}
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 					enum_type = MEETING_ROOM;
 				else {
 					printf("Unknown type\n");
-					send_nok();
+					send_nok(msg.sender, mailbox);
 					break;
 				}
 				
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 				area_segm_id = create_area(enum_type, name);
 				if(area_segm_id == -1) {
 					printf("Error while creating the area\n");
-					send_nok();
+					send_nok(msg.sender, mailbox);
 					break;
 				}
 
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
 				areas_list=add_area_to_list(areas_list,area_segm_id,&success);
 				if(!success) {
 					printf("Error while adding the area to the list\n");
-					send_nok();
+					send_nok(msg.sender, mailbox);
 					break;
 				}
 				
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
 				del_area(name, &success);
 				if(!success) {
 					printf("Error while deleting the area\n");
-					send_nok();
+					send_nok(msg.sender, mailbox);
 					break;
 				}
 				nb_areas--;
@@ -186,7 +186,7 @@ void list_areas(pid_t sender, int mailbox) {
 	//send message
 	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
 		perror("msgsnd");
-		send_nok();
+				send_nok(sender, mailbox);
 	}
 }
 
