@@ -26,9 +26,9 @@ int create_area(enum type type, char* name);
  * @brief Verify if an area exists in the list
  * @param name: name of the area to search
  * @param head: head of the list
- * @return int: 1 if the area exists, 0 otherwise
+ * @return bool: true if the area exists, false otherwise
  */
-int area_exists(char name[LENGTH_NAME_AREA], node_t * head);
+bool area_exists(char* name, node_t * head);
 
 /**
  * @brief Add an area to the list of known areas

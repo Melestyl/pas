@@ -160,9 +160,9 @@ int create_area(enum type type, char* name) {
  * @brief Verify if an area exists in the list
  * @param name: name of the area to search
  * @param head: head of the list
- * @return int: 1 if the area exists, 0 otherwise
+ * @return bool: true if the area exists, false otherwise
  */
-int area_exists(char name[LENGTH_NAME_AREA], node_t * head) {
+bool area_exists(char* name, node_t * head) {
 	node_t * temp = head;
 	area_t * area;
 
@@ -179,7 +179,7 @@ int area_exists(char name[LENGTH_NAME_AREA], node_t * head) {
 				perror("shmdt");
 				exit(1);
 			}
-			return 1;
+			return true;
 		}
 
 		// Detaching shared memory and moving to the next node
@@ -189,7 +189,7 @@ int area_exists(char name[LENGTH_NAME_AREA], node_t * head) {
 		}
 		temp = temp->next;
 	}
-	return 0;
+	return false;
 }
 
 /**
@@ -198,10 +198,7 @@ int area_exists(char name[LENGTH_NAME_AREA], node_t * head) {
  * @param shared_memory: shared memory segment of the area to add
  */
 node_t * add_area_to_list(node_t * head, int shared_memory) {
-	if (head == NULL)
-		return create_node(shared_memory);
-	else
-		return add_node(head, shared_memory);
+	return add_node(head, shared_memory);
 }
 
 /**

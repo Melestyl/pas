@@ -9,7 +9,7 @@ node_t *areas_list = NULL;
 
 int main(int argc, char* argv[]) {
 	int nb_areas = 0;
-	int num, area_segm_id;
+	int mailbox, area_segm_id;
     key_t msg_key = MESSAGE_KEY; // key of the message queue
     int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
@@ -17,19 +17,19 @@ int main(int argc, char* argv[]) {
 	char name[LENGTH_NAME_AREA]; // name of the area
 
 	// Creating message queue
-    if ((num = msgget(msg_key,msg_flag)) == -1)
+    if ((mailbox = msgget(msg_key,msg_flag)) == -1)
     {
 		perror("msgget");
 		exit(1);
     }
 
-	printf("Message queue created with id %d\n", num);
+	printf("Message queue created with id %d\n", mailbox);
 
 	while(1){
 		struct message msg;
 
 		// Receiving message
-		if (msgrcv(num, &msg, sizeof(struct message)-sizeof(long), 1, 0) == -1) {
+		if (msgrcv(mailbox, &msg, sizeof(struct message)-sizeof(long), 1, 0) == -1) {
 			perror("msgrcv");
 			exit(1);
 		}
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 				break;
 			case ASK_AREAS:
 				printf("Message code ASK_AREAS\n");
-				ask_areas(msg.sender, num);
+				list_areas(msg.sender, mailbox);
 				break;
 			case LIST_AREAS:
 				printf("\"LIST_AREAS\" the server does not receive this code : send NOK\n");
@@ -95,9 +95,9 @@ int main(int argc, char* argv[]) {
 
 				//delete area
 				del_area(area_segm_id); //TODO: anticipate the case of a deletion error
-				
+				nb_areas--;
 				//send ok
-				send_ok(msg.sender, num);
+				send_ok(msg.sender, mailbox);
 
 
 				break;
@@ -114,7 +114,7 @@ void send_nok() {
 	// TODO
 }
 
-void send_ok(pid_t sender, int num) {
+void send_ok(pid_t sender, int mailbox) {
 	struct message msg_send;
 
 	//init message
@@ -123,21 +123,22 @@ void send_ok(pid_t sender, int num) {
 	msg_send.code = OK;
 
 	//send message
-	if (msgsnd(num, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
 		perror("msgsnd");
 		exit(1);
 	}
 	printf("OK message envoyé à %d\n", sender);
 }
 
-void ask_areas(pid_t sender, int num) {
-	char data[MAX_LENGTH_DATA];
+void list_areas(pid_t sender, int mailbox) {
+	char data[MAX_LENGTH_DATA], tmp[LENGTH_ID_SEGM];
 	node_t * temp = areas_list;
 	struct message msg_send;
 
 	//read the list of areas and put it in data
 	while(temp != NULL) {
-		sprintf(data, "%d:", temp->data);
+		sprintf(tmp, "%d:", temp->data);
+		strcat(data, tmp);
 		temp = temp->next;
 	}
 	data[strlen(data)-1] = '\0'; //removing the last ':' and replacing it by '\0'
@@ -149,12 +150,12 @@ void ask_areas(pid_t sender, int num) {
 	strcpy(msg_send.data, data);
 
 	//send message
-	if (msgsnd(num, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
 		perror("msgsnd");
 		exit(1);
 	}
 }
 
 void del_area(int area_segm_id) {
-	areas_list=(areas_list,area_segm_id);
+	areas_list=remove_area_from_list(areas_list,area_segm_id);
 }
