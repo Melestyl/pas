@@ -259,7 +259,35 @@ void show_my_bookings() {
 }
 
 void add_area() {
-    printf("Ajouter un earea\n");
+	char name[LENGTH_NAME_AREA];
+	char type;
+	struct message msg_send, msg_rcv;
+
+	// Asking for the name and the type of the area
+	printf("Nom de l'emplacement : ");
+	scanf("%s", name);
+	printf("Type de l'emplacement (0 pour bureau, 1 pour salle de réunion) : ");
+	scanf("%c", &type);
+
+	// Serializing the area
+	msg_send.code = CREATE_AREA;
+	sprintf(msg_send.data, "%c:%s", type, name);
+
+	// Sending the message
+	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+		perror("msgsnd");
+		exit(1);
+	}
+
+	// Waiting for the answer
+	if (msgrcv(mailbox, &msg_rcv, sizeof(struct message)-sizeof(long), getpid(), 0) == -1) {
+		perror("msgrcv");
+		exit(1);
+	}
+	if (msg_rcv.code == OK)
+		printf("Emplacement ajouté avec succès\n");
+	else
+		printf("Erreur lors de l'ajout de l'emplacement\n");
 }
 
 void delete_area() {

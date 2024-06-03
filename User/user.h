@@ -1,5 +1,8 @@
 #include "../Common/common.h"
 
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
 // admin password to access the admin menu
 #define ADMIN_PASSWORD "1234"
 
