@@ -76,9 +76,9 @@ int main(int argc, char* argv[]) {
 
 
 				// Convert char type to enum type
-				if (type == 0)
+				if (type == '0')
 					enum_type = DESK;
-				else if (type == 1)
+				else if (type == '1')
 					enum_type = MEETING_ROOM;
 				else {
 					printf("Unknown type\n");
@@ -97,11 +97,16 @@ int main(int argc, char* argv[]) {
 				nb_areas++;
 
 				//add the area to the list
+				printf("Adding the area to the list\n");
 				areas_list=add_area_to_list(areas_list,area_segm_id,&success);
 				if(!success) {
 					printf("Error while adding the area to the list\n");
 					send_nok(msg.sender, mailbox);
 					break;
+				}
+				else {
+					printf("Area added to the list\n");
+					send_ok(msg.sender, mailbox);
 				}
 				
 				break;
