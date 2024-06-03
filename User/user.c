@@ -4,8 +4,21 @@
 node_t *area_list = NULL;
 node_t *my_bookings = NULL;
 
+// Global mailbox
+int mailbox;
+
 int main(int argc, char *argv[]) {
     char is_admin = 0; // Remind if the user is an admin
+	key_t msg_key = MESSAGE_KEY; // key of the message queue
+	int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
+
+	// Creating message queue
+	if ((mailbox = msgget(msg_key,msg_flag)) == -1) {
+		perror("msgget");
+		exit(1);
+	}
+
+	printf("Message queue created with id %d\n", mailbox);
 
     // Check if the user is admin
     if (argc == 2 && strcmp(argv[1], ADMIN_PASSWORD) == 0) {
