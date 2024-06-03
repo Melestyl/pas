@@ -11,6 +11,7 @@
 #include <errno.h>
 
 #include "protocol.h"
+#include "linked_list.h"
 
 #define MESSAGE_KEY 69 //FIXME: config.txt
 

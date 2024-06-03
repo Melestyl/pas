@@ -5,7 +5,7 @@ FILE_NAME=server
 
 AREAS=areas.o
 
-COMMON=../Common/common.o
+COMMON=../Common/common.o ../Common/linked_list.o
 
 all: common $(AREAS) $(FILE_NAME).exe
 
