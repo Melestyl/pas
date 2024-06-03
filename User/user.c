@@ -10,7 +10,7 @@ int mailbox;
 int main(int argc, char *argv[]) {
     char is_admin = 0; // Remind if the user is an admin
 	key_t msg_key = MESSAGE_KEY; // key of the message queue
-	int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
+	int msg_flag = IPC_CREAT | 0666; // flag of the message queue
 
 	// Creating message queue
 	if ((mailbox = msgget(msg_key,msg_flag)) == -1) {
@@ -80,10 +80,59 @@ void menu(char is_admin) {
     }
 }
 
+/**
+ * @brief Remove a node from the list
+ * @param head: head of the list
+ * @param name: name to remove
+ * @param success: bool to indicate if the node was removed
+ * @return new head of the list
+ */
+node_t * remove_node(node_t * head, char* name, bool* success) {
+	node_t * temp = head;
+	node_t * prev = NULL;
+	area_t * area;
+
+
+	while(temp != NULL) {
+		// Attaching shared memory
+		area = (area_t *) shmat(temp->data, NULL, 0) ;
+		if( area == (area_t *)-1) {
+			perror("shmat");
+			*success = false;
+		}
+
+		// Comparing names of areas and if found, detaching shared memory and returning shared memory segment
+		if(strcmp(area->name,name)==0) {
+			if(prev == NULL) {
+				head = temp->next;
+				free(temp);
+				*success = true;
+				return head;
+			}
+			else if(prev == NULL && temp->next == NULL){
+				free(temp);
+				*success = true;
+				return NULL;
+			}
+			else {
+				prev->next = temp->next;
+				free(temp);
+				*success = true;
+				return head;
+			}
+		}
+		prev = temp;
+		temp = temp->next;
+	}
+	*success = false;
+	return head;
+}
+
 void parse_areas(char *serialized_areas) {
 	// The data is in this form: "segmid:segmid:segmid:..."
 	// And all segmid should be added in the linked list area_list (being cleared before)
 	int segmid;
+	bool success = false;
 
 	// Clearing the list
 	free_list(area_list);
@@ -93,7 +142,7 @@ void parse_areas(char *serialized_areas) {
 	char *token = strtok(serialized_areas, ":");
 	while(token != NULL) {
 		segmid = atoi(token);
-		add_node(area_list, segmid);
+		area_list = add_node(area_list, segmid, &success);
 		token = strtok(NULL, ":");
 	}
 }
@@ -127,7 +176,7 @@ void show_areas() {
 	node_t * temp = area_list;
 	area_t * area;
 
-	printf("Liste des emplacements :\n")
+	printf("Liste des emplacements :\n");
 
 	// Updating the list of areas
 	update_areas();
@@ -223,7 +272,7 @@ void book_area() {
 	else {
 		area->shared_memory = getpid();
 		// Adding to my bookings
-		add_node(my_bookings, temp->data, &success);
+		area_list = add_node(my_bookings, temp->data, &success);
 		printf("Emplacement réservé avec succès\n");
 	}
 
@@ -266,7 +315,7 @@ void return_area() {
 	else {
 		area->shared_memory = 0;
 		// Removing from my bookings
-		remove_node(my_bookings, name, &success);
+		area_list = remove_node(my_bookings, name, &success);
 		printf("Emplacement rendu avec succès\n");
 	}
 
@@ -281,7 +330,7 @@ void show_my_bookings() {
 	node_t * temp = my_bookings;
 	area_t * area;
 
-	printf("Liste de mes réservations :\n")
+	printf("Liste de mes réservations :\n");
 
 	while(temp != NULL) {
 		// Attaching shared memory
@@ -312,14 +361,18 @@ void add_area() {
 	// Asking for the name and the type of the area
 	printf("Nom de l'emplacement : ");
 	scanf("%s", name);
+	getchar();
 	printf("Type de l'emplacement (0 pour bureau, 1 pour salle de réunion) : ");
 	scanf("%c", &type);
 
 	// Serializing the area
+	msg_send.mtype = 1;
+	msg_send.sender = getpid();
 	msg_send.code = CREATE_AREA;
 	sprintf(msg_send.data, "%c:%s", type, name);
 
 	// Sending the message
+	printf("%c\n", type);
 	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
 		perror("msgsnd");
 		exit(1);
