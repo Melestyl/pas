@@ -135,7 +135,6 @@ void book_area() {
 	char name[LENGTH_NAME_AREA];
 	node_t * temp = area_list;
 	area_t * area;
-	bool found = false;
 
 	printf("Quel emplacement voulez-vous réserver ? ");
 	scanf("%s", name);
