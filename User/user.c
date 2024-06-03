@@ -80,11 +80,57 @@ void menu(char is_admin) {
     }
 }
 
+void parse_areas(char *serialized_areas) {
+	// The data is in this form: "segmid:segmid:segmid:..."
+	// And all segmid should be added in the linked list area_list (being cleared before)
+	int segmid;
+
+	// Clearing the list
+	free_list(area_list);
+	area_list = NULL;
+
+	// Parsing the data
+	char *token = strtok(serialized_areas, ":");
+	while(token != NULL) {
+		segmid = atoi(token);
+		add_node(area_list, segmid);
+		token = strtok(NULL, ":");
+	}
+}
+
+void update_areas() {
+	struct message msg_send, msg_rcv;
+
+	// Serializing the message
+	msg_send.code = ASK_AREAS;
+
+	// Sending the message
+	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+		perror("msgsnd");
+		exit(1);
+	}
+
+	// Waiting for the answer
+	if (msgrcv(mailbox, &msg_rcv, sizeof(struct message)-sizeof(long), getpid(), 0) == -1) {
+		perror("msgrcv");
+		exit(1);
+	}
+	if (msg_rcv.code == LIST_AREAS) {
+		// Parsing the list of areas
+		parse_areas(msg_rcv.data);
+	}
+	else
+		printf("Erreur lors de la récupération des emplacements\n");
+}
+
 void show_areas() {
 	node_t * temp = area_list;
 	area_t * area;
 
 	printf("Liste des emplacements :\n")
+
+	// Updating the list of areas
+	update_areas();
 
 	while(temp != NULL) {
 		// Attaching shared memory
