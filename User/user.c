@@ -219,7 +219,30 @@ void return_area() {
 }
 
 void show_my_bookings() {
-    printf("Voir mes réservations\n");
+	node_t * temp = my_bookings;
+	area_t * area;
+
+	printf("Liste de mes réservations :\n")
+
+	while(temp != NULL) {
+		// Attaching shared memory
+		area = (area_t *) shmat(temp->data, NULL, 0);
+		if(area == (area_t *)-1) {
+			perror("shmat");
+			exit(1);
+		}
+
+		// Printing infos
+		printf("Nom : %s\n", area->name);
+		area->type == DESK ? printf("Type : Bureau\n") : printf("Type : Salle de réunion\n");
+
+		// Detaching shared memory and moving to the next node
+		if(shmdt(area) == -1) {
+			perror("shmdt");
+			exit(1);
+		}
+		temp = temp->next;
+	}
 }
 
 void add_area() {
