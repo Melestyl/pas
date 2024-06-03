@@ -174,19 +174,22 @@ void list_areas(pid_t sender, int mailbox) {
 	node_t * temp = areas_list;
 	struct message msg_send;
 
+	//init data
+	strcpy(data, "");
+	strcpy(msg_send.data, "");
+
 	//read the list of areas and put it in data
 	while(temp != NULL) {
 		sprintf(tmp, "%d:", temp->data);
-		strcat(data, tmp);
+		strcat(msg_send.data, tmp);
 		temp = temp->next;
 	}
-	data[strlen(data)-1] = '\0'; //removing the last ':' and replacing it by '\0'
+	msg_send.data[strlen(msg_send.data)-1] = '\0'; //removing the last ':' and replacing it by '\0'
 
 	//init message
 	msg_send.mtype = sender;
 	msg_send.sender = getpid();
 	msg_send.code = LIST_AREAS;
-	strcpy(msg_send.data, data);
 
 	//send message
 	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {

@@ -143,6 +143,10 @@ void parse_areas(char *serialized_areas) {
 	while(token != NULL) {
 		segmid = atoi(token);
 		area_list = add_node(area_list, segmid, &success);
+		if(!success) {
+			printf("Erreur lors de l'ajout de l'emplacement\n");
+			exit(1);
+		}
 		token = strtok(NULL, ":");
 	}
 }
@@ -151,7 +155,10 @@ void update_areas() {
 	struct message msg_send, msg_rcv;
 
 	// Serializing the message
+	msg_send.mtype = 1;
+	msg_send.sender = getpid();
 	msg_send.code = ASK_AREAS;
+	strcpy(msg_send.data, "");
 
 	// Sending the message
 	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
@@ -180,6 +187,7 @@ void show_areas() {
 
 	// Updating the list of areas
 	update_areas();
+	temp = area_list;
 
 	while(temp != NULL) {
 		// Attaching shared memory
@@ -272,7 +280,7 @@ void book_area() {
 	else {
 		area->shared_memory = getpid();
 		// Adding to my bookings
-		area_list = add_node(my_bookings, temp->data, &success);
+		my_bookings = add_node(my_bookings, temp->data, &success);
 		printf("Emplacement réservé avec succès\n");
 	}
 
