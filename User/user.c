@@ -2,6 +2,7 @@
 
 // Global list of areas
 node_t *area_list = NULL;
+node_t *my_bookings = NULL;
 
 int main(int argc, char *argv[]) {
     char is_admin = 0; // Remind if the user is an admin
@@ -135,6 +136,7 @@ void book_area() {
 	char name[LENGTH_NAME_AREA];
 	node_t * temp = area_list;
 	area_t * area;
+	bool success = false;
 
 	printf("Quel emplacement voulez-vous réserver ? ");
 	scanf("%s", name);
@@ -161,6 +163,8 @@ void book_area() {
 	// Reserving the area
 	else {
 		area->shared_memory = getpid();
+		// Adding to my bookings
+		add_node(my_bookings, temp->data, &success);
 		printf("Emplacement réservé avec succès\n");
 	}
 
@@ -173,14 +177,15 @@ void book_area() {
 
 void return_area() {
 	char name[LENGTH_NAME_AREA];
-	node_t * temp = area_list;
+	node_t * temp = my_bookings;
 	area_t * area;
+	bool success = false;
 
 	printf("Quel emplacement voulez-vous rendre ? ");
 	scanf("%s", name);
 
 	// Searching for the area
-	temp = search_for_area(name, area_list);
+	temp = search_for_area(name, my_bookings);
 	if(temp == NULL) {
 		printf("Cet emplacement n'existe pas\n");
 		return;
@@ -194,17 +199,16 @@ void return_area() {
 	}
 
 	// Checking if the area is already reserved
-	if(area->shared_memory == 0) {
-		printf("Cet emplacement est déjà libre\n");
+	if(area->shared_memory != getpid()) {
+		printf("Cet emplacement n'est pas réservé par vous\n");
 		return;
 	}
 	// Returning the area
-	else if (area->shared_memory == getpid()) {
-		area->shared_memory = 0;
-		printf("Emplacement rendu avec succès\n");
-	}
 	else {
-		printf("Cet emplacement n'est pas réservé par vous\n");
+		area->shared_memory = 0;
+		// Removing from my bookings
+		remove_node(my_bookings, name, &success);
+		printf("Emplacement rendu avec succès\n");
 	}
 
 	// Detaching shared memory
