@@ -1,5 +1,8 @@
 #include "user.h"
 
+// Global list of areas
+node_t *area_list = NULL;
+
 int main(int argc, char *argv[]) {
     char is_admin = 0; // Remind if the user is an admin
 
@@ -64,7 +67,31 @@ void menu(char is_admin) {
 }
 
 void show_areas() {
-    printf("Liste des eareas :\n");
+	node_t * temp = area_list;
+	area_t * area;
+
+	printf("Liste des emplacements :\n")
+
+	while(temp != NULL) {
+		// Attaching shared memory
+		area = (area_t *) shmat(temp->data, NULL, 0);
+		if(area == (area_t *)-1) {
+			perror("shmat");
+			exit(1);
+		}
+
+		// Printing infos
+		printf("Nom : %s\n", area->name);
+		area->type == DESK ? printf("Type : Bureau\n") : printf("Type : Salle de réunion\n");
+		area->shared_memory == 0 ? printf("Statut : Libre\n") : printf("Statut : Réservé\n");
+
+		// Detaching shared memory and moving to the next node
+		if(shmdt(area) == -1) {
+			perror("shmdt");
+			exit(1);
+		}
+		temp = temp->next;
+	}
 }
 
 void book_area() {
