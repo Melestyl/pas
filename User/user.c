@@ -172,7 +172,46 @@ void book_area() {
 }
 
 void return_area() {
-    printf("Rendre un earea\n");
+	char name[LENGTH_NAME_AREA];
+	node_t * temp = area_list;
+	area_t * area;
+
+	printf("Quel emplacement voulez-vous rendre ? ");
+	scanf("%s", name);
+
+	// Searching for the area
+	temp = search_for_area(name, area_list);
+	if(temp == NULL) {
+		printf("Cet emplacement n'existe pas\n");
+		return;
+	}
+
+	// Attaching shared memory
+	area = (area_t *) shmat(temp->data, NULL, 0);
+	if(area == (area_t *)-1) {
+		perror("shmat");
+		exit(1);
+	}
+
+	// Checking if the area is already reserved
+	if(area->shared_memory == 0) {
+		printf("Cet emplacement est déjà libre\n");
+		return;
+	}
+	// Returning the area
+	else if (area->shared_memory == getpid()) {
+		area->shared_memory = 0;
+		printf("Emplacement rendu avec succès\n");
+	}
+	else {
+		printf("Cet emplacement n'est pas réservé par vous\n");
+	}
+
+	// Detaching shared memory
+	if(shmdt(area) == -1) {
+		perror("shmdt");
+		exit(1);
+	}
 }
 
 void show_my_bookings() {
