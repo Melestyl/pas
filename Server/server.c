@@ -7,6 +7,9 @@
 // Global areas list
 node_t *areas_list = NULL;
 
+// Global message queue id
+int mailbox;
+
 int main(int argc, char* argv[]) {
 	int nb_areas = 0;
 	int mailbox, area_segm_id;
