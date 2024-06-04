@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 				printf("Message code CREATE_AREA\n");
 
 				// Check if the maximum number of areas is not reached
-				if (nb_areas > MAX_AREA) {
+				if (nb_areas >= MAX_AREA) {
 					printf("Too many areas\n");
 					send_nok(msg.sender, mailbox);
 					break;

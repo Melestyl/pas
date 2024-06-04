@@ -189,6 +189,7 @@ void show_areas() {
 	update_areas();
 	temp = area_list;
 
+	printf("--------------------\n");
 	while(temp != NULL) {
 		// Attaching shared memory
 		area = (area_t *) shmat(temp->data, NULL, 0);
@@ -208,6 +209,7 @@ void show_areas() {
 			exit(1);
 		}
 		temp = temp->next;
+		printf("--------------------\n");
 	}
 }
 
@@ -340,6 +342,7 @@ void show_my_bookings() {
 
 	printf("Liste de mes réservations :\n");
 
+	printf("--------------------\n");
 	while(temp != NULL) {
 		// Attaching shared memory
 		area = (area_t *) shmat(temp->data, NULL, 0);
@@ -358,6 +361,7 @@ void show_my_bookings() {
 			exit(1);
 		}
 		temp = temp->next;
+		printf("--------------------\n");
 	}
 }
 
