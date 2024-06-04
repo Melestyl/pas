@@ -323,7 +323,7 @@ void return_area() {
 	else {
 		area->shared_memory = 0;
 		// Removing from my bookings
-		area_list = remove_node(my_bookings, name, &success);
+		my_bookings = remove_node(my_bookings, name, &success);
 		printf("Emplacement rendu avec succès\n");
 	}
 
