@@ -1,0 +1,2 @@
+MAILBOX_PATH ../Common/mailbox
+SHARED_MEMORY_PATH ../Common/shared_memory
