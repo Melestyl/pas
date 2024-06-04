@@ -433,5 +433,24 @@ void delete_area() {
 }
 
 void end() {
+	node_t * temp = my_bookings;
+	area_t * area;
+
+	// Returning all areas
+	while(temp != NULL) {
+		area = (area_t *) shmat(temp->data, NULL, 0);
+		if(area == (area_t *)-1) {
+			perror("shmat");
+			exit(1);
+		}
+		area->shared_memory = 0;
+		if(shmdt(area) == -1) {
+			perror("shmdt");
+			exit(1);
+		}
+		temp = temp->next;
+	}
+
+	// Exiting the user
     exit(0);
 }
