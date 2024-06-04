@@ -12,13 +12,20 @@ int mailbox;
 
 int main(int argc, char* argv[]) {
 	int nb_areas = 0;
-	int mailbox, area_segm_id;
+	int area_segm_id;
 	bool success;
 	key_t msg_key = MESSAGE_KEY; // key of the message queue
 	int msg_flag = IPC_CREAT | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
 	char type; // equivalent of enum type in char
 	char name[LENGTH_NAME_AREA]; // name of the area
+	struct sigaction act;
+
+	// Handling SIGINT using sigaction
+	act.sa_handler = sigint_handler;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	sigaction(SIGINT, &act, NULL);
 
 	// Creating message queue
     if ((mailbox = msgget(msg_key,msg_flag)) == -1)
@@ -138,6 +145,30 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+}
+
+void sigint_handler(int sig) {
+	node_t * temp = areas_list;
+
+	printf("SIGINT received\n");
+
+	// Removing the message queue
+	if (msgctl(mailbox, IPC_RMID, NULL) == -1) {
+		perror("msgctl");
+		exit(1);
+	}
+
+	// Removing the shared memory segments
+	while(temp != NULL) {
+		if (shmctl(temp->data, IPC_RMID, NULL) == -1) {
+			perror("shmctl");
+			exit(1);
+		}
+		temp = temp->next;
+	}
+
+	// Exiting the server
+	exit(0);
 }
 
 void send_nok(pid_t sender, int mailbox) {
