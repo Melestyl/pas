@@ -402,7 +402,34 @@ void add_area() {
 }
 
 void delete_area() {
-    printf("Supprimer un earea\n");
+	char name[LENGTH_NAME_AREA];
+	struct message msg_send, msg_rcv;
+
+	// Asking for the name of the area
+	printf("Nom de l'emplacement : ");
+	scanf("%s", name);
+
+	// Serializing the area
+	msg_send.mtype = 1;
+	msg_send.sender = getpid();
+	msg_send.code = DEL_AREA;
+	strcpy(msg_send.data, name);
+
+	// Sending the message
+	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
+		perror("msgsnd");
+		exit(1);
+	}
+
+	// Waiting for the answer
+	if (msgrcv(mailbox, &msg_rcv, sizeof(struct message)-sizeof(long), getpid(), 0) == -1) {
+		perror("msgrcv");
+		exit(1);
+	}
+	if (msg_rcv.code == OK)
+		printf("Emplacement supprimé avec succès\n");
+	else
+		printf("Erreur lors de la suppression de l'emplacement\n");
 }
 
 void end() {

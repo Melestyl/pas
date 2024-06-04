@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 	int mailbox, area_segm_id;
 	bool success;
 	key_t msg_key = MESSAGE_KEY; // key of the message queue
-	int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
+	int msg_flag = IPC_CREAT | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
 	char type; // equivalent of enum type in char
 	char name[LENGTH_NAME_AREA]; // name of the area
