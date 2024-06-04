@@ -32,7 +32,8 @@ int main(int argc, char *argv[]) {
 
 void menu(char is_admin) {
     int choice = -1; // User choice
-    printf("\nQue voulez-vous faire ?\n"
+	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    printf("Que voulez-vous faire ?\n"
             "\t0. Quitter\n"
             "\t1. Afficher la liste des emplacement (Bureaux et salles de réunion)\n"
             "\t2. Réserver un emplacement\n"
@@ -41,41 +42,51 @@ void menu(char is_admin) {
     
     if(is_admin) {
             printf("\t5. Ajouter un emplacement\n"
-            "\t6. Supprimer un emplacement\n");
+            "\t6. Supprimer un emplacement");
     }
+	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
     printf("\nVotre choix : ");
     scanf("%d", &choice);
+	CLEAR_SCREEN();
     switch (choice) {
         case 0:
             printf("Au revoir!\n");
             end(); //TODO: Verify if there is any reservation area and anything 
         case 1:
+	        printf("~~ Liste des emplacements :\n\n");
             show_areas();
             break;
         case 2:
+			printf("~~ Réservation d'un emplacement :\n\n");
             book_area();
             break;
         case 3:
+			printf("~~ Rendre un emplacement :\n\n");
             return_area();
             break;
         case 4:
-            show_my_bookings();
+	        printf("~~ Liste de mes réservations :\n\n");
+		    show_my_bookings();
             break;
         case 5:
-            if(is_admin)
-                add_area();
+            if(is_admin) {
+				printf("~~ Ajout d'un emplacement :\n\n");
+	            add_area();
+            }
             else
-                printf("Commande inconnue\n");
+                printf("Commande inconnue\n\n");
             break;
         case 6:
-            if(is_admin)
-                delete_area();
+            if(is_admin) {
+				printf("~~ Suppression d'un emplacement :\n\n");
+	            delete_area();
+            }
             else
-                printf("Commande inconnue\n");
+                printf("Commande inconnue\n\n");
             break;
         default:
-            printf("Commande inconnue\n");
+            printf("Commande inconnue\n\n");
             break;
     }
 }
@@ -183,8 +194,6 @@ void show_areas() {
 	node_t * temp = area_list;
 	area_t * area;
 
-	printf("Liste des emplacements :\n");
-
 	// Updating the list of areas
 	update_areas();
 	temp = area_list;
@@ -256,8 +265,15 @@ void book_area() {
 	area_t * area;
 	bool success = false;
 
-	printf("Quel emplacement voulez-vous réserver ? ");
-	scanf("%s", name);
+	// Asking for the name and the type of the area
+	printf("Quel emplacement voulez-vous réserver ? : ");
+	getchar(); // Flushing buffer
+	fgets(name, LENGTH_NAME_AREA, stdin);
+	name[strlen(name)-1] = '\0'; // Removing the '\n' character from the name
+
+	// Flushing buffer
+	printf("(appuyez sur Entrée pour continuer...)\n");
+	while (getchar() != '\n');
 
 	// Searching for the area
 	temp = search_for_area(name, area_list);
@@ -299,8 +315,15 @@ void return_area() {
 	area_t * area;
 	bool success = false;
 
-	printf("Quel emplacement voulez-vous rendre ? ");
-	scanf("%s", name);
+	// Asking for the name and the type of the area
+	printf("Quel emplacement voulez-vous rendre ? : ");
+	getchar(); // Flushing buffer
+	fgets(name, LENGTH_NAME_AREA, stdin);
+	name[strlen(name)-1] = '\0'; // Removing the '\n' character from the name
+
+	// Flushing buffer
+	printf("(appuyez sur Entrée pour continuer...)\n");
+	while (getchar() != '\n');
 
 	// Searching for the area
 	temp = search_for_area(name, my_bookings);
@@ -340,8 +363,6 @@ void show_my_bookings() {
 	node_t * temp = my_bookings;
 	area_t * area;
 
-	printf("Liste de mes réservations :\n");
-
 	printf("--------------------\n");
 	while(temp != NULL) {
 		// Attaching shared memory
@@ -372,8 +393,19 @@ void add_area() {
 
 	// Asking for the name and the type of the area
 	printf("Nom de l'emplacement : ");
-	scanf("%s", name);
-	getchar();
+	getchar(); // Flushing buffer
+	fgets(name, LENGTH_NAME_AREA, stdin);
+	name[strlen(name)-1] = '\0'; // Removing the '\n' character from the name
+
+	if (strlen(name) == 0) {
+		printf("Nom invalide\n");
+		return;
+	}
+
+	// Flushing buffer
+	printf("(appuyez sur Entrée pour continuer...)\n");
+	while (getchar() != '\n');
+
 	printf("Type de l'emplacement (0 pour bureau, 1 pour salle de réunion) : ");
 	scanf("%c", &type);
 
@@ -384,7 +416,6 @@ void add_area() {
 	sprintf(msg_send.data, "%c:%s", type, name);
 
 	// Sending the message
-	printf("%c\n", type);
 	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {
 		perror("msgsnd");
 		exit(1);
@@ -405,9 +436,20 @@ void delete_area() {
 	char name[LENGTH_NAME_AREA];
 	struct message msg_send, msg_rcv;
 
-	// Asking for the name of the area
+	// Asking for the name and the type of the area
 	printf("Nom de l'emplacement : ");
-	scanf("%s", name);
+	getchar(); // Flushing buffer
+	fgets(name, LENGTH_NAME_AREA, stdin);
+	name[strlen(name)-1] = '\0'; // Removing the '\n' character from the name
+
+	if (strlen(name) == 0) {
+		printf("Nom invalide\n");
+		return;
+	}
+
+	// Flushing buffer
+	printf("(appuyez sur Entrée pour continuer...)\n");
+	while (getchar() != '\n');
 
 	// Serializing the area
 	msg_send.mtype = 1;
