@@ -1,7 +1,13 @@
 #include "../Common/common.h"
 
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <unistd.h>
+
 // admin password to access the admin menu
 #define ADMIN_PASSWORD "1234"
+
+#define CLEAR_SCREEN() system("clear")
 
 /**
  * @brief Show the user menu

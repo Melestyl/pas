@@ -7,15 +7,25 @@
 // Global areas list
 node_t *areas_list = NULL;
 
+// Global message queue id
+int mailbox;
+
 int main(int argc, char* argv[]) {
 	int nb_areas = 0;
-	int mailbox, area_segm_id;
+	int area_segm_id;
 	bool success;
 	key_t msg_key = MESSAGE_KEY; // key of the message queue
-	int msg_flag = IPC_CREAT | IPC_EXCL | 0666; // flag of the message queue
+	int msg_flag = IPC_CREAT | 0666; // flag of the message queue
 	enum type enum_type; // type of the area
 	char type; // equivalent of enum type in char
 	char name[LENGTH_NAME_AREA]; // name of the area
+	struct sigaction act;
+
+	// Handling SIGINT using sigaction
+	act.sa_handler = sigint_handler;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	sigaction(SIGINT, &act, NULL);
 
 	// Creating message queue
     if ((mailbox = msgget(msg_key,msg_flag)) == -1)
@@ -58,7 +68,7 @@ int main(int argc, char* argv[]) {
 				printf("Message code CREATE_AREA\n");
 
 				// Check if the maximum number of areas is not reached
-				if (nb_areas > MAX_AREA) {
+				if (nb_areas >= MAX_AREA) {
 					printf("Too many areas\n");
 					send_nok(msg.sender, mailbox);
 					break;
@@ -76,9 +86,9 @@ int main(int argc, char* argv[]) {
 
 
 				// Convert char type to enum type
-				if (type == 0)
+				if (type == '0')
 					enum_type = DESK;
-				else if (type == 1)
+				else if (type == '1')
 					enum_type = MEETING_ROOM;
 				else {
 					printf("Unknown type\n");
@@ -97,11 +107,16 @@ int main(int argc, char* argv[]) {
 				nb_areas++;
 
 				//add the area to the list
+				printf("Adding the area to the list\n");
 				areas_list=add_area_to_list(areas_list,area_segm_id,&success);
 				if(!success) {
 					printf("Error while adding the area to the list\n");
 					send_nok(msg.sender, mailbox);
 					break;
+				}
+				else {
+					printf("Area added to the list\n");
+					send_ok(msg.sender, mailbox);
 				}
 				
 				break;
@@ -130,6 +145,30 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+}
+
+void sigint_handler(int sig) {
+	node_t * temp = areas_list;
+
+	printf("SIGINT received\n");
+
+	// Removing the message queue
+	if (msgctl(mailbox, IPC_RMID, NULL) == -1) {
+		perror("msgctl");
+		exit(1);
+	}
+
+	// Removing the shared memory segments
+	while(temp != NULL) {
+		if (shmctl(temp->data, IPC_RMID, NULL) == -1) {
+			perror("shmctl");
+			exit(1);
+		}
+		temp = temp->next;
+	}
+
+	// Exiting the server
+	exit(0);
 }
 
 void send_nok(pid_t sender, int mailbox) {
@@ -169,19 +208,22 @@ void list_areas(pid_t sender, int mailbox) {
 	node_t * temp = areas_list;
 	struct message msg_send;
 
+	//init data
+	strcpy(data, "");
+	strcpy(msg_send.data, "");
+
 	//read the list of areas and put it in data
 	while(temp != NULL) {
 		sprintf(tmp, "%d:", temp->data);
-		strcat(data, tmp);
+		strcat(msg_send.data, tmp);
 		temp = temp->next;
 	}
-	data[strlen(data)-1] = '\0'; //removing the last ':' and replacing it by '\0'
+	msg_send.data[strlen(msg_send.data)-1] = '\0'; //removing the last ':' and replacing it by '\0'
 
 	//init message
 	msg_send.mtype = sender;
 	msg_send.sender = getpid();
 	msg_send.code = LIST_AREAS;
-	strcpy(msg_send.data, data);
 
 	//send message
 	if (msgsnd(mailbox, &msg_send, sizeof(struct message)-sizeof(long), 0) == -1) {

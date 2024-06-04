@@ -4,8 +4,11 @@
 #include <stdlib.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <signal.h>
 
 #include "../Common/common.h"
+
+void sigint_handler(int sig);
 
 /**
  * @fn void send_nok(pid_t sender, int mailbox)
